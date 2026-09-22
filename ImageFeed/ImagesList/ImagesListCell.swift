@@ -33,10 +33,7 @@ final class ImagesListCell: UITableViewCell {
     
     // Настраиваем состояние лайка
     func configureLike(_ isLiked: Bool) {
-        if isLiked {
-            likeButton.setImage(UIImage(named: "Active"), for: .normal)
-        } else {
-            likeButton.setImage(UIImage(named: "No Active"), for: .normal)
-        }
+        let imageName = isLiked ? "LikeActive" : "LikeInactive"
+        likeButton.setImage(UIImage(named: imageName), for: .normal)
     }
 }

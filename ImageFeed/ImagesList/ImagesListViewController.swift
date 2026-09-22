@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ImagesListViewController: UIViewController {
+final class ImagesListViewController: UIViewController {
     
     // MARK: - UI Elements
     
@@ -16,7 +16,7 @@ class ImagesListViewController: UIViewController {
     // MARK: - Data
     
     // Название фотографий
-    private let photosName: [String] = Array(0..<20).map { "\($0)" }
+    private let photoNames: [String] = Array(0..<20).map { "\($0)" }
     
     // Форматирование даты для подписи фотографии
     private lazy var dateFormatter: DateFormatter = {
@@ -31,8 +31,6 @@ class ImagesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.rowHeight = 200
-        
         tableView.contentInset = UIEdgeInsets(
             top: 12,
             left: 0,
@@ -44,7 +42,7 @@ class ImagesListViewController: UIViewController {
     // MARK: - Cell Configuration
     
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        let photoName = photosName[indexPath.row]
+        let photoName = photoNames[indexPath.row]
         guard let image = UIImage(named: photoName) else {
             return
         }
@@ -53,11 +51,7 @@ class ImagesListViewController: UIViewController {
         let dateText = dateFormatter.string(from: Date())
         cell.configureDate(dateText)
         
-        if indexPath.row % 2 == 0 {
-            cell.configureLike(true)
-        } else {
-            cell.configureLike(false)
-        }
+        cell.configureLike(indexPath.row % 2 == 0)
     }
 }
 
@@ -65,7 +59,7 @@ class ImagesListViewController: UIViewController {
 
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return photosName.count
+        return photoNames.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -87,19 +81,27 @@ extension ImagesListViewController: UITableViewDelegate {
         
     }
     
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let image = UIImage(named: photosName[indexPath.row]),
-              let cgImage = image.cgImage else {
+    // MARK: - UITableViewDelegate
+    
+    func tableView(
+        _ tableView: UITableView,
+        heightForRowAt indexPath: IndexPath
+    ) -> CGFloat {
+
+        guard let image = UIImage(named: photoNames[indexPath.row]) else {
             return 200
         }
         
-        let imageWidth = CGFloat(cgImage.width)
-        let imageHeight = CGFloat(cgImage.height)
-        let tableViewWidth = tableView.bounds.width
-        let cellWidth = tableViewWidth - 16 * 2
+        let imageWidth = image.size.width
+        let imageHeight = image.size.height
+    
+        let horizontalInset: CGFloat = 16
+        let verticalInset: CGFloat = 4
         
-        let result = cellWidth * imageHeight / imageWidth + 8
+        let imageViewWidth = tableView.bounds.width - horizontalInset * 2
         
-        return result
+        let imageViewHeight = imageViewWidth * imageHeight / imageWidth
+        
+        return imageViewHeight + verticalInset * 2
     }
 }
