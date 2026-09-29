@@ -26,6 +26,9 @@ final class ImagesListViewController: UIViewController {
         return formatter
     }()
     
+    // Одиночное изображение
+    private let showSingleImageSegueIdentifier = "ShowSingleImage"
+    
     // MARK: Lifecycle
     
     override func viewDidLoad() {
@@ -53,6 +56,25 @@ final class ImagesListViewController: UIViewController {
         
         cell.configureLike(indexPath.row % 2 == 0)
     }
+    
+    // MARK: - Navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == showSingleImageSegueIdentifier {
+            guard
+                let viewController = segue.destination as? SingleImageViewController,
+                let indexPath = sender as? IndexPath
+                    else {
+                assertionFailure("Invalid segue destination")
+                return
+            }
+            
+            let image = UIImage(named: photoNames[indexPath.row])
+            viewController.image = image
+        } else {
+            super.prepare(for: segue, sender: sender)
+        }
+    }
 }
 
 // MARK: - UITableViewDataSource
@@ -78,7 +100,7 @@ extension ImagesListViewController: UITableViewDataSource {
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        performSegue(withIdentifier: showSingleImageSegueIdentifier, sender: indexPath)
     }
     
     // MARK: - UITableViewDelegate
@@ -87,14 +109,14 @@ extension ImagesListViewController: UITableViewDelegate {
         _ tableView: UITableView,
         heightForRowAt indexPath: IndexPath
     ) -> CGFloat {
-
+        
         guard let image = UIImage(named: photoNames[indexPath.row]) else {
             return 200
         }
         
         let imageWidth = image.size.width
         let imageHeight = image.size.height
-    
+        
         let horizontalInset: CGFloat = 16
         let verticalInset: CGFloat = 4
         
